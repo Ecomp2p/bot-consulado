@@ -1,5 +1,4 @@
 selenium
 python-dotenv
-webdriver-manager
 flask
-undetected-chromedriver
+webdriver-manager
