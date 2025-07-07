@@ -1,9 +1,5 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
 from dotenv import load_dotenv
 import os
 import time
@@ -22,13 +18,11 @@ LOGIN_URL = "https://www.cgeonline.com.ar/usuarios/login.html"
 TURNOS_URL = "https://www.cgeonline.com.ar/tramites/citas/modificar/seleccionar-nueva-fecha.html"
 
 def iniciar_driver():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    options = uc.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    driver = uc.Chrome(options=options)
     return driver
 
 def loguearse(driver):
