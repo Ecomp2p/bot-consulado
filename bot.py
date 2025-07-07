@@ -1,14 +1,9 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-
-from dotenv import load_dotenv
 import os
 import time
 import smtplib
 from email.message import EmailMessage
+from dotenv import load_dotenv
+from playwright.sync_api import sync_playwright
 
 # Cargar variables de entorno
 load_dotenv()
@@ -20,32 +15,6 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 LOGIN_URL = "https://www.cgeonline.com.ar/usuarios/login.html"
 TURNOS_URL = "https://www.cgeonline.com.ar/tramites/citas/modificar/seleccionar-nueva-fecha.html"
-
-def iniciar_driver():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
-
-def loguearse(driver):
-    driver.get(LOGIN_URL)
-    time.sleep(2)
-    driver.find_element(By.NAME, "email").send_keys(USUARIO)
-    driver.find_element(By.NAME, "password").send_keys(PASSWORD)
-    driver.find_element(By.XPATH, '//button[contains(text(),"Ingresar")]').click()
-    time.sleep(3)
-
-def revisar_turnos(driver):
-    driver.get(TURNOS_URL)
-    time.sleep(2)
-    pagina = driver.page_source
-    if "En este momento no hay fechas disponibles" not in pagina:
-        return True
-    return False
 
 def enviar_alerta():
     msg = EmailMessage()
@@ -59,13 +28,30 @@ def enviar_alerta():
         smtp.send_message(msg)
 
 def main():
-    driver = iniciar_driver()
-    try:
-        loguearse(driver)
-        if revisar_turnos(driver):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+
+        # Paso 1: Ingresar al login
+        page.goto(LOGIN_URL)
+        page.fill('input[name="email"]', USUARIO)
+        page.fill('input[name="password"]', PASSWORD)
+        page.click('button:has-text("Ingresar")')
+
+        # Esperar a que cargue la página luego del login
+        page.wait_for_timeout(3000)
+
+        # Paso 2: Ir a la página de turnos
+        page.goto(TURNOS_URL)
+        page.wait_for_timeout(3000)
+
+        # Paso 3: Revisar si hay turnos disponibles
+        contenido = page.content()
+
+        if "En este momento no hay fechas disponibles" not in contenido:
             enviar_alerta()
-    finally:
-        driver.quit()
+
+        browser.close()
 
 if __name__ == "__main__":
     main()
