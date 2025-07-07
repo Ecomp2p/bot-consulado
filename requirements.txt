@@ -2,3 +2,4 @@ selenium
 python-dotenv
 flask
 webdriver-manager
+playwright
