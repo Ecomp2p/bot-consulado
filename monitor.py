@@ -15,7 +15,7 @@ def obtener_fecha_actual():
     filas = soup.select("table tr")[13]  # Fila 13 incluyendo encabezado
     columnas = filas.find_all("td")
     if len(columnas) >= 3:
-        return columnas[2].get_text(strip=True)
+        return "simulacion-cambio"
     return None
 
 def enviar_email(asunto, cuerpo):
