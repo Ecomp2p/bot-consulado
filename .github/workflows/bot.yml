@@ -33,5 +33,5 @@ jobs:
           echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> $GITHUB_ENV
           echo "EMAILS_DESTINO=${{ secrets.EMAILS_DESTINO }}" >> $GITHUB_ENV
 
-      - name: Ejecutar el bot
-        run: python bot.py
+    - name: Ejecutar el monitor
+      run: python monitor.py
