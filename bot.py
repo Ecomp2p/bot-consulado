@@ -52,17 +52,13 @@ def main():
 
             contenido = page.content()
 
-            if "En este momento no hay fechas disponibles" not in contenido:
-                if not turnos_ya_notificados():
-                    enviar_alerta()
-                    marcar_turnos_notificados()
-                    print("✅ Turnos detectados. Correo enviado.")
-                else:
-                    print("⚠️ Turnos ya notificados. No se reenvía.")
+            # 🧪 Modo TEST: forzamos el envío del correo sin importar el contenido
+            if not turnos_ya_notificados():
+                enviar_alerta()
+                marcar_turnos_notificados()
+                print("✅ [TEST] Correo enviado como si hubiera turnos.")
             else:
-                print("❌ No hay turnos disponibles.")
-                if os.path.exists(STATUS_FILE):
-                    os.remove(STATUS_FILE)
+                print("⚠️ [TEST] Ya se envió el correo. No se vuelve a enviar.")
 
             browser.close()
 
