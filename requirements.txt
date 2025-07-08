@@ -3,3 +3,4 @@ python-dotenv
 flask
 webdriver-manager
 playwright
+beautifulsoup4
