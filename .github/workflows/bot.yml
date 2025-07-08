@@ -1,9 +1,9 @@
-name: Ejecutar bot cada 15 minutos
+name: Ejecutar bot cada hora
 
 on:
   schedule:
-    - cron: "*/15 * * * *"  # cada 15 minutos
-  workflow_dispatch:        # también podés ejecutarlo manualmente desde GitHub
+    - cron: "0 * * * *"  # cada 1 hora
+  workflow_dispatch:
 
 jobs:
   ejecutar-bot:
@@ -18,20 +18,15 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Instalar dependencias del sistema (Playwright)
+      - name: Instalar dependencias
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libnss3 libatk-bridge2.0-0 libxss1 libasound2t64 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libgtk-3-0 libxkbcommon0 libx11-xcb1 libxcb-dri3-0
           pip install -r requirements.txt
-          playwright install
 
       - name: Establecer variables de entorno
         run: |
-          echo "USUARIO_CONSULADO=${{ secrets.USUARIO_CONSULADO }}" >> $GITHUB_ENV
-          echo "PASSWORD_CONSULADO=${{ secrets.PASSWORD_CONSULADO }}" >> $GITHUB_ENV
           echo "EMAIL_ORIGEN=${{ secrets.EMAIL_ORIGEN }}" >> $GITHUB_ENV
           echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> $GITHUB_ENV
           echo "EMAILS_DESTINO=${{ secrets.EMAILS_DESTINO }}" >> $GITHUB_ENV
 
-    - name: Ejecutar el monitor
-      run: python monitor.py
+      - name: Ejecutar el bot
+        run: python monitor.py
